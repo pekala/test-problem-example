@@ -1,5 +1,33 @@
 # Problem with Jest + Redux async actions with Promises
 
+> ### UPDATE
+>
+> After a bit of tinkering I've a working solution, which was
+> [made even nicer](https://github.com/facebook/jest/issues/2157#issuecomment-279171856)
+> by one of the Jest contributors.
+>
+> ```javascript
+> const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+> test('changing the reddit downloads posts', () => {
+>    selectBox.simulate('change', { target: { value : 'frontend' } })
+>    return flushPromises().then(() => {
+>        expect(store.getActions()).toEqual([
+>            {
+>                type: 'REQUEST_POSTS',
+>                reddit: 'frontend'
+>            },
+>            {
+>                type: 'RECEIVE_POSTS',
+>                reddit: 'frontend',
+>                posts: [],
+>            }
+>        ])
+>    })
+>});
+>```
+> The `flushPromises` should probably be part of the Jest API, so it's more easily understandable
+> how to handle cases like this one.
+
 In the `src/integration.test.js` I would like to test whether a correct sequence
 of actions is dispatched in response to user interacting with the select box.
 

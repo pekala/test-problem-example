@@ -23,7 +23,20 @@ const wrapper = mount(
 );
 const selectBox = wrapper.find('select')
 
+const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 test('changing the reddit downloads posts', () => {
     selectBox.simulate('change', { target: { value : 'frontend' } })
-    // assert on actions sequence
+    return flushPromises().then(() => {
+        expect(store.getActions()).toEqual([
+            {
+                type: 'REQUEST_POSTS',
+                reddit: 'frontend'
+            },
+            {
+                type: 'RECEIVE_POSTS',
+                reddit: 'frontend',
+                posts: [],
+            }
+        ])
+    })
 });
